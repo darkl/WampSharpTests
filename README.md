@@ -65,6 +65,7 @@ Case 1:
 Case 2:
 Case 3:
     No _realm.TopicContainer.TopicRemoved event fired
+    ** FIXED in 1.2.2.53-dev **
     
 Case 4:
     System.StackOverflowException was unhandled
@@ -94,6 +95,8 @@ Case 5:
     No _topic.SubscriptionRemoving/Removed event fired
     
 Case 6:
+    Check multiple exceptions in WampSharpDemo.log:
+    ---
     [WampSharp.Fleck.FleckWebSocketTransport] Failed to send. Disconnecting.
 System.AggregateException: One or more errors occurred. ---> System.IO.IOException: Unable to write data to the transport connection: An existing connection was forcibly closed by the remote host. ---> System.Net.Sockets.SocketException: An existing connection was forcibly closed by the remote host
    at System.Net.Sockets.Socket.EndSend(IAsyncResult asyncResult)
@@ -101,5 +104,8 @@ System.AggregateException: One or more errors occurred. ---> System.IO.IOExcepti
    --- End of inner exception stack trace ---
    at System.Net.Sockets.NetworkStream.EndWrite(IAsyncResult asyncResult)
    at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+   
+   As a result: An unhandled exception of type 'System.StackOverflowException' occurred in mscorlib.dll
+
 
 
