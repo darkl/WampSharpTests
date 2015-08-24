@@ -54,7 +54,7 @@ namespace WampSharpDemo
             var eventsToTest = int.Parse(eventToTestTb.Text);
             var numClients = int.Parse(numClientsTb.Text);
             var local = ClientsLocation().Equals("in-process");
-            var terminateAnyClientInTheMiddle = case4.Checked || case5.Checked;
+            var terminateAnyClientInTheMiddle = case4.Checked;
             //
             ThreadPool.QueueUserWorkItem(state =>
             {
@@ -88,17 +88,17 @@ namespace WampSharpDemo
                     //
                     while (Server.CurrentSessions > 0) Thread.Sleep(1000);
                     //
-                    if (Server.Instance.CurrentTopics > 0)
-                    {
-                        MessageBox.Show("Load test completed. Did not get _realm.TopicContainer.TopicRemoved event. "
-                                        + "\r\nStill have " + Server.Instance.CurrentTopics + " topics alive."
-                                        + "\r\nPlease check WampSharpDemo.log for details.",
-                            "Error");
-                    }
-                    else if (Server.CurrentSubscribers > 0)
+                    if (Server.CurrentSubscribers > 0)
                     {
                         MessageBox.Show("Load test completed. Did not get _topic.SubscriptionRemoving/Removed event. "
                                         + "\r\nStill have " + Server.CurrentSubscribers + " subscriptions alive."
+                                        + "\r\nPlease check WampSharpDemo.log for details.",
+                            "Error");
+                    }
+                    else if (Server.Instance.CurrentTopics > 0)
+                    {
+                        MessageBox.Show("Load test completed. Did not get _realm.TopicContainer.TopicRemoved event. "
+                                        + "\r\nStill have " + Server.Instance.CurrentTopics + " topics alive."
                                         + "\r\nPlease check WampSharpDemo.log for details.",
                             "Error");
                     }
