@@ -39,7 +39,8 @@ namespace WampSharpDemo
                 //
                 for (var i = 0; i < Configs.N_SUBJECTS; i++)
                 {
-                    channel.RealmProxy.Services.GetSubject<WsEvent>(Configs.SUBJECT_ + i).Subscribe(
+                    string topicUri = Configs.SUBJECT_ + i;
+                    channel.RealmProxy.Services.GetSubject<WsEvent>(topicUri).Subscribe(
                         @event =>
                         {
                             Interlocked.Add(ref EventsConsumed, 1);
@@ -50,6 +51,10 @@ namespace WampSharpDemo
                             }
                             //
                             Thread.Sleep(workTimeMillis);
+                        },
+                        ex =>
+                        {
+                            Logger.Error($"Error during {topicUri} subscription", ex);
                         });
                 }
                 //
