@@ -7,7 +7,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using log4net;
+using Newtonsoft.Json.Linq;
+using WampSharp.Binding;
 using WampSharp.V2;
+using WampSharp.V2.Core.Contracts;
+using WampSharp.WebSocket4Net;
 
 namespace WampSharpDemo
 {
@@ -32,7 +36,9 @@ namespace WampSharpDemo
         public void SubscribeAndWait(int workTimeMillis = 85)
         {
             var factory = new DefaultWampChannelFactory();
-            var channel = factory.CreateMsgpackChannel(Configs.ServerAddress, "realm");
+            var binding = new JTokenMsgpackBinding();
+
+            var channel = factory.CreateChannel("realm", new WebSocket4NetBinaryConnection<JToken>(Configs.ServerAddress, binding), binding);
             try
             {
                 channel.Open().Wait();
@@ -72,7 +78,10 @@ namespace WampSharpDemo
             }
             finally
             {
-                channel.Close("Test complete", "Client #" + _id);
+                channel.Close("Test complete", new GoodbyeDetails()
+                {
+                    Message = "Client #" + _id
+                });
             }
         }
 

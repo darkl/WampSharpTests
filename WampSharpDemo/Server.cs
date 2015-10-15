@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
@@ -11,9 +12,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Castle.Core.Internal;
 using log4net;
+using WampSharp.Binding;
+using WampSharp.Fleck;
 using WampSharp.V2;
 using WampSharp.V2.PubSub;
 using WampSharp.V2.Realm;
+using WampSharp.Vtortola;
 
 namespace WampSharpDemo
 {
@@ -36,7 +40,12 @@ namespace WampSharpDemo
 
         private Server()
         {
-            _wampHost = new DefaultWampHost(Configs.ServerAddress);
+            _wampHost = new WampHost();
+
+            _wampHost.RegisterTransport(new FleckWebSocketTransport(Configs.ServerAddress),
+                new JTokenMsgpackBinding());
+            //_wampHost.RegisterTransport(new VtortolaWebSocketTransport(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 2015), true),
+            //    new JTokenMsgpackBinding());
             //
             _wampHost.Open();
             //
@@ -44,13 +53,13 @@ namespace WampSharpDemo
             _realm.SessionCreated +=
                 (sender, args) =>
                 {
-                    CurrentSessions++;
-                    Logger.Info(sender + " session created: " + args.SessionId + " details=" + args.Details);
+                    Interlocked.Increment(ref CurrentSessions);
+                    Logger.Info(sender + " session created: " + args.SessionId + " details=" + args.HelloDetails);
                 };
             _realm.SessionClosed +=
                 (sender, args) =>
                 {
-                    CurrentSessions--;
+                    Interlocked.Decrement(ref CurrentSessions);
                     Logger.Info(sender + " session closed : " + args.SessionId + " reason=" + args.Reason +
                                 " closeType=" + args.CloseType);
                 };
